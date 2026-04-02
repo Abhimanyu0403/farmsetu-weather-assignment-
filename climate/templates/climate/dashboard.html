@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UK Climate Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a2e;
+      padding: 2rem;
+    }
+
+    h1 { font-size: 1.5rem; margin-bottom: 2rem; color: #1a1a2e; }
+    h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #333; }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: .3rem; flex: 1; min-width: 160px; }
+    label { font-size: .8rem; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .04em; }
+
+    select, button {
+      padding: .5rem .75rem;
+      border-radius: 5px;
+      border: 1px solid #d0d5dd;
+      font-size: .9rem;
+    }
+
+    select { background: #fff; cursor: pointer; }
+
+    button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #93c5fd; cursor: not-allowed; }
+
+    #load-status { margin-top: .75rem; font-size: .85rem; min-height: 1.2em; }
+    #load-status.error { color: #dc2626; }
+    #load-status.success { color: #16a34a; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    th { text-align: left; padding: .5rem .75rem; background: #f1f5f9; font-weight: 600; color: #555; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+    td { padding: .5rem .75rem; border-top: 1px solid #f1f5f9; }
+    tr:hover td { background: #f8fafc; }
+
+    .btn-view {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+      padding: .3rem .75rem;
+      font-size: .8rem;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-view:hover { background: #dbeafe; }
+
+    #viewer { display: none; }
+
+    .viewer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: .75rem;
+    }
+
+    #period-selector { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+    .period-btn {
+      padding: .3rem .65rem;
+      border-radius: 4px;
+      border: 1px solid #d0d5dd;
+      background: #fff;
+      font-size: .8rem;
+      cursor: pointer;
+    }
+    .period-btn.active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+
+    #chart-container { position: relative; height: 300px; margin-bottom: 1.5rem; }
+
+    #data-table-wrapper { overflow-x: auto; }
+
+    .empty { color: #888; font-size: .875rem; padding: .5rem 0; }
+  </style>
+</head>
+<body>
+
+<h1>🌦 UK Climate Dashboard</h1>
+
+<!-- Import form -->
+<div class="card">
+  <h2>Import Dataset</h2>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="sel-region">Region</label>
+      <select id="sel-region"></select>
+    </div>
+    <div class="form-group">
+      <label for="sel-parameter">Parameter</label>
+      <select id="sel-parameter"></select>
+    </div>
+    <div class="form-group">
+      <label for="sel-order">Order</label>
+      <select id="sel-order"></select>
+    </div>
+    <button id="btn-load">Load Dataset</button>
+  </div>
+  <p id="load-status"></p>
+</div>
+
+<!-- Imported datasets table -->
+<div class="card">
+  <h2>Imported Datasets</h2>
+  <div id="datasets-wrapper">
+    <p class="empty">No datasets imported yet.</p>
+  </div>
+</div>
+
+<!-- Data viewer -->
+<div class="card" id="viewer">
+  <div class="viewer-header">
+    <h2 id="viewer-title">Data Viewer</h2>
+    <div id="period-selector"></div>
+  </div>
+  <div id="chart-container">
+    <canvas id="chart"></canvas>
+  </div>
+  <div id="data-table-wrapper"></div>
+</div>
+
+<script src="{% static 'climate/dashboard.js' %}"></script>
+</body>
+</html>
