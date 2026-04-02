@@ -18,9 +18,19 @@ async function apiFetch(url, options = {}) {
 const DATE_PERIODS   = ["ann","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","win","spr","sum","aut"];
 const RANKED_PERIODS = ["ann","jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","win","spr","sum","aut"];
 
+const PERIOD_LABELS = {
+  ann: "Annual", win: "Winter", spr: "Spring", sum: "Summer", aut: "Autumn",
+  jan: "January", feb: "February", mar: "March",  apr: "April",
+  may: "May",     jun: "June",     jul: "July",   aug: "August",
+  sep: "September", oct: "October", nov: "November", dec: "December",
+};
+
+const ORDER_LABELS = { date: "Date", ranked: "Ranked" };
+
 let chartInstance = null;
 let activeDataset = null;
 let activePeriod  = "ann";
+let activeRowEl   = null;
 
 /* ── DOM refs ────────────────────────────────────────────── */
 
@@ -82,11 +92,11 @@ async function refreshDatasets() {
           <tr>
             <td>${ds.region_name}</td>
             <td>${ds.parameter_name}</td>
-            <td>${ds.order_type}</td>
+            <td>${ORDER_LABELS[ds.order_type] ?? ds.order_type}</td>
             <td>${ds.series_start_year ?? "—"}</td>
             <td>
               <button class="btn-view" data-id="${ds.id}" data-order="${ds.order_type}"
-                      data-title="${ds.region_name} · ${ds.parameter_name} (${ds.order_type})">
+                      data-title="${ds.region_name} · ${ds.parameter_name} (${ORDER_LABELS[ds.order_type] ?? ds.order_type})">
                 View
               </button>
             </td>
@@ -95,11 +105,19 @@ async function refreshDatasets() {
     </table>`;
 
   datasetsWrap.querySelectorAll(".btn-view").forEach(btn => {
-    btn.addEventListener("click", () => openViewer(
-      Number(btn.dataset.id),
-      btn.dataset.order,
-      btn.dataset.title,
-    ));
+    btn.addEventListener("click", () => {
+      // highlight selected row
+      if (activeRowEl) activeRowEl.classList.remove("active-row");
+      activeRowEl = btn.closest("tr");
+      activeRowEl.classList.add("active-row");
+
+      openViewer(
+        Number(btn.dataset.id),
+        btn.dataset.order,
+        btn.dataset.title,
+        btn,
+      );
+    });
   });
 }
 
@@ -147,20 +165,26 @@ function setStatus(msg, type) {
 
 /* ── viewer ──────────────────────────────────────────────── */
 
-async function openViewer(datasetId, orderType, title) {
+async function openViewer(datasetId, orderType, title, triggerBtn) {
   activeDataset = { id: datasetId, orderType };
   activePeriod  = "ann";
   viewerTitle.textContent = title;
   viewer.style.display = "block";
   viewer.scrollIntoView({ behavior: "smooth" });
 
+  if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.textContent = "Loading…"; }
   buildPeriodButtons(orderType === "date" ? DATE_PERIODS : RANKED_PERIODS);
-  await renderViewer();
+  try {
+    await renderViewer();
+  } finally {
+    if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.textContent = "View"; }
+  }
 }
 
 function buildPeriodButtons(periods) {
   periodSel.innerHTML = periods.map(p =>
-    `<button class="period-btn${p === activePeriod ? " active" : ""}" data-period="${p}">
+    `<button class="period-btn${p === activePeriod ? " active" : ""}" data-period="${p}"
+            title="${PERIOD_LABELS[p] ?? p}">
       ${p.toUpperCase()}
     </button>`
   ).join("");
