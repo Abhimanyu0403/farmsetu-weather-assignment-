@@ -43,7 +43,12 @@ def dataset_load(request):
             order_type=request.data["order_type"],
         )
     except Exception as exc:
-        return Response({"error": str(exc)}, status=status.HTTP_502_BAD_GATEWAY)
+        import requests as req_lib
+        if isinstance(exc, req_lib.HTTPError) and exc.response is not None and exc.response.status_code == 404:
+            msg = "We couldn't find climate data for this selection. Try a different region, parameter, or order type."
+        else:
+            msg = "Failed to import dataset. Please try again later."
+        return Response({"error": msg}, status=status.HTTP_502_BAD_GATEWAY)
 
     return Response(ClimateDatasetSerializer(dataset).data, status=status.HTTP_201_CREATED)
 
