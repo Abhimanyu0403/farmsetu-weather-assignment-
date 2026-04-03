@@ -54,7 +54,7 @@ climate/ Core application
 ### 1. Clone the repository
 
 
-git clone <repository-url>
+git clone https://github.com/Abhimanyu0403/farmsetu-weather-assignment-.git
 cd farmsetu-weather-assignment
 
 
