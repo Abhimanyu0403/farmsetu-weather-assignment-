@@ -34,17 +34,18 @@ This project fetches summarized climate data from the UK Met Office, processes b
 
 ## Project Structure
 
-
-config/ Django project configuration
-climate/ Core application
-├── api.py API endpoints
-├── models.py Database models
-├── services/ Parsing and import logic
-├── serializers.py DRF serializers
-├── constants.py Region and parameter definitions
-├── templates/ Dashboard HTML
-├── static/ Frontend JavaScript
-├── tests/ Test suite
+```
+config/                  Django project configuration
+climate/                 Core application
+├── api.py               API endpoints
+├── models.py            Database models
+├── services/            Parsing and import logic
+├── serializers.py       DRF serializers
+├── constants.py         Region and parameter definitions
+├── templates/           Dashboard HTML
+├── static/              Frontend JavaScript
+└── tests/               Test suite
+```
 
 
 ---
@@ -53,9 +54,10 @@ climate/ Core application
 
 ### 1. Clone the repository
 
-
+```bash
 git clone https://github.com/Abhimanyu0403/farmsetu-weather-assignment-.git
 cd farmsetu-weather-assignment
+```
 
 
 ### 2. Configure environment variables
@@ -170,6 +172,17 @@ docker compose exec web python manage.py test
 - Function-based API views for simplicity
 - Frontend interacts exclusively through API endpoints
 - Graceful handling of missing upstream datasets
+
+---
+
+## Deployment
+
+The application is deployed on Railway.
+
+- Live URL: https://farmsetu-weather-assignment-production.up.railway.app/
+- Served with Gunicorn + WhiteNoise
+- PostgreSQL provisioned via Railway
+- Migrations and static file collection run automatically on deploy via `entrypoint.sh`
 
 ---
 
